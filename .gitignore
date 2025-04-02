@@ -1,0 +1,10 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# MinIO 내부 시스템 디렉토리
+static/.minio.sys/
+
+my-ssr-site
+.env
