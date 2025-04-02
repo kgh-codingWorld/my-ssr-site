@@ -1,10 +1,15 @@
 import os
+import psycopg2
 from dotenv import load_dotenv
 
 load_dotenv()
 
 MINIO_URL = os.getenv("MINIO_URL")
 
-REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
-REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
-REDIS_CACHE_TTL = int(os.getenv("REDIS_CACHE_TTL", 300))
+PG_CONFIG = {
+    "host": os.getenv("POSTGRES_HOST"),
+    "port": os.getenv("POSTGRES_PORT"),
+    "dbname": os.getenv("POSTGRES_DB"),
+    "user": os.getenv("POSTGRES_USER"),
+    "password": os.getenv("POSTGRES_PASSWORD"),
+}

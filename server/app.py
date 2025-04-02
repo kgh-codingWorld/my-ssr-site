@@ -1,7 +1,7 @@
 from flask import Flask, Response
 import requests
 import time
-from server.cache.redis_cache import cache
+from server.cache.pg_cache import get_cache, set_cache
 from server.utils.file_util import fetch_file
 from server.log.logger import logging
 
@@ -14,12 +14,13 @@ def index():
     cache_key = "page:index"
 
     # 캐시에 존재
-    if cache.exists(cache_key):
+    cached_html = get_cache(cache_key)
+    if cached_html:
         duration = time.time() - start
-        logging.info(f"✅ Redis HIT: {duration:.4f}초")
-        return Response(cache.get(cache_key), mimetype="text/html")
+        logging.info(f"✅ PostgreSQL Cache HIT: {duration:.4f}초")
+        return Response(cached_html, mimetype="text/html")
     
-    logging.info("❌ Redis MISS")
+    logging.info("❌ PostgreSQL Cache MISS")
     #time.sleep(5)
     
     # 캐시에 부재
@@ -34,10 +35,11 @@ def index():
     html_with_css = html.replace("<!-- CSS_PLACEHOLDER -->", f"<style>{css}</style>")
 
     # 캐시에 저장(5분=300초)
-    cache.setex(cache_key, 300, html_with_css)
+    set_cache(cache_key, html_with_css, ttl=300)
 
     duration = time.time() - start
     logging.info(f"✅ SSR 처리 완료 (처리 시간: {duration:.4f}초)")
+    
     return Response(html_with_css, mimetype="text/html; charset=utf-8")
 
 if __name__ == "__main__":
